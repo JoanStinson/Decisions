@@ -1,13 +1,7 @@
-/* ========================================================================
-   File: Vector2D.h
-   Revision: 0.1
-   Creator: David Collado Ochoa
-   Notice: (C) Copyright 2016 by David Collado Ochoa. All Rights Reserved.
-   ======================================================================== */
-
 #pragma once
-
 #include <math.h>
+#include <tuple> 
+#include <functional>
 
 #ifndef M_PI	
 #define M_PI	3.14159265358979323846   // pi
@@ -16,89 +10,105 @@
 #define RAD2DEG (180.0f / (float)M_PI)
 #define DEG2RAD ((float)M_PI / 180.0f)
 
-struct Vector2D
+class Vector2D
 {
+public:
 	float x = 0.0f;
 	float y = 0.0f;
-	
-	Vector2D(float valueX = 0.0f, float valueY = 0.0f): x{valueX}, y{valueY}
-	{}
-	
-	inline float Length() const
-	{
+
+	Vector2D(float valueX = 0.0f, float valueY = 0.0f) : x{ valueX }, y{ valueY } {}
+
+	inline float Length() const {
 		return (float)sqrt(x * x + y * y);
 	}
 
-	inline float LengthSquared() const
-	{
+	inline float LengthSquared() const {
 		return x * x + y * y;
 	}
-	
-	inline Vector2D operator+(const Vector2D& v)
-	{
+
+	// Operators Overloaded
+	inline Vector2D operator()(const Vector2D& v) {
+		return v.x + v.y;
+	}
+
+	inline Vector2D operator+(const Vector2D& v) {
 		return Vector2D(x + v.x, y + v.y);
 	}
-	inline void operator+=(const Vector2D& v2)
-	{
-		x += v2.x;
-		y += v2.y;
+
+	inline void operator+=(const Vector2D& v) {
+		x += v.x;
+		y += v.y;
 	}
-	
-	inline Vector2D operator-(const Vector2D& v)
-	{
+
+	inline Vector2D operator-(const Vector2D& v) {
 		return Vector2D(x - v.x, y - v.y);
 	}
-	inline void operator-=(const Vector2D& v)
-	{
+
+	inline void operator-=(const Vector2D& v) {
 		x -= v.x;
 		y -= v.y;
 	}
-	
-	inline Vector2D operator*(float scalar)
-	{
+
+	inline Vector2D operator*(float scalar) {
 		return Vector2D(x * scalar, y * scalar);
 	}
-	inline void operator*=(float scalar)
-	{
+
+	inline void operator*=(float scalar) {
 		x *= scalar;
 		y *= scalar;
 	}
-	
-	inline Vector2D operator/(float scalar)
-	{
+
+	inline Vector2D operator/(float scalar) {
 		return Vector2D(x / scalar, y / scalar);
 	}
-	inline void operator/=(float scalar)
-	{
+
+	inline void operator/=(float scalar) {
 		x /= scalar;
 		y /= scalar;
 	}
 
-	inline bool operator==(const Vector2D& rhs) const
-	{
+	inline bool operator==(const Vector2D& rhs) const {
 		return (x == rhs.x)
 			&& (y == rhs.y);
 	}
-	inline bool operator!=(const Vector2D& rhs) const
-	{
+
+	inline bool operator!=(const Vector2D& rhs) const {
 		return !operator==(rhs);
 	}
-	
+
+	// Needed operators to deal with maps :)
+	inline bool operator<(const Vector2D& rhs) const {
+		return std::tie(x, y) < std::tie(rhs.x, rhs.y);
+	}
+
+	inline bool operator<=(const Vector2D& rhs) const {
+		return !(std::tie(x, y) <  std::tie(rhs.x, rhs.y));
+	}
+
+	inline bool operator>(const Vector2D& rhs) const {
+		return std::tie(x, y) <  std::tie(rhs.x, rhs.y);
+	}
+
+	inline bool operator>=(const Vector2D& rhs) const {
+		return !(std::tie(x, y) <  std::tie(rhs.x, rhs.y));
+	}
+
 	inline Vector2D Normalize()
 	{
 		float l = Length();
-		if ( l > 0.0f)
+		if (l > 0.0f)
 		{
 			(*this) *= 1.0f / l;
 		}
 		return (*this);
 	}
+
 	static inline Vector2D Normalize(const Vector2D& v)
 	{
 		float l = v.Length();
-		if ( l > 0.0f)
+		if (l > 0.0f)
 		{
-			return Vector2D(v.x / l, v.y/ l);
+			return Vector2D(v.x / l, v.y / l);
 		}
 		else
 		{
@@ -141,6 +151,7 @@ struct Vector2D
 		Vector2D v = start - end;
 		return v.LengthSquared();
 	}
+
 };
 
 namespace Vector2DUtils
@@ -185,7 +196,7 @@ namespace Vector2DUtils
 		// infinite version of its cone.
 		// We'll use Dot() to 
 		// determine angle between apexToPoint and axisVect.
-		bool isInInfiniteCone = (Vector2D::Dot(apexToPoint, axisVect) / 
+		bool isInInfiniteCone = (Vector2D::Dot(apexToPoint, axisVect) /
 			(apexToPoint.Length() * axisVect.Length())) > cosf(coneHalfAngle * (float)DEG2RAD);
 
 		if (!isInInfiniteCone)
@@ -220,7 +231,7 @@ namespace Vector2DUtils
 	}
 
 	// s1_start is line1 start, s1_end is line1 end, s2_start is line2 start, s2_end is line2 end
-	static bool SegmentSegmentIntersection(Vector2D s1_start, Vector2D s1_end, Vector2D s2_start, Vector2D s2_end, 
+	static bool SegmentSegmentIntersection(Vector2D s1_start, Vector2D s1_end, Vector2D s2_start, Vector2D s2_end,
 		bool doIntersectOnPoints = true, Vector2D* intersectionPoint = nullptr)
 	{
 		intersectionPoint = {};
@@ -290,4 +301,14 @@ namespace Vector2DUtils
 			return true;
 		return false;
 	}
+}
+
+// Necessary to use unordered_maps
+namespace std {
+	template<>
+	struct hash<Vector2D> {
+		size_t operator()(const Vector2D& v) const {
+			return std::hash<float>()(v.Length());
+		}
+	};
 }

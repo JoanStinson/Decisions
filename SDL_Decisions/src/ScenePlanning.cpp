@@ -2,6 +2,7 @@
 
 using namespace std;
 
+
 ScenePlanning::ScenePlanning()
 {
 	draw_grid = false;
@@ -9,7 +10,7 @@ ScenePlanning::ScenePlanning()
 	num_cell_x = SRC_WIDTH / CELL_SIZE;
 	num_cell_y = SRC_HEIGHT / CELL_SIZE;
 	initMaze();
-	loadTextures("../res/maze.png", "../res/coin.png");
+	loadTextures("../res/coin.png");
 
 	srand((unsigned int)time(NULL));
 
@@ -18,20 +19,29 @@ ScenePlanning::ScenePlanning()
 	agents.push_back(agent);
 
 
-	// set agent position coords to the center of a random cell
-	Vector2D rand_cell(-1,-1);
-	while (!isValidCell(rand_cell)) 
+	// Set agent position coords to the center of a random cell
+	Vector2D rand_cell(-1, -1);
+	while (!isValidCell(rand_cell))
 		rand_cell = Vector2D((float)(rand() % num_cell_x), (float)(rand() % num_cell_y));
 	agents[0]->setPosition(cell2pix(rand_cell));
+	start = agents[0]->getPosition();
 
-	// set the coin in a random cell (but at least 3 cells far from the agent)
-	coinPosition = Vector2D(-1,-1);
-	while ((!isValidCell(coinPosition)) || (Vector2D::Distance(coinPosition, rand_cell)<3)) 
+	// Set the coin in a random cell (but at least 3 cells far from the agent)
+	coinPosition = Vector2D(-1, -1);
+	while ((!isValidCell(coinPosition)) || (Vector2D::Distance(coinPosition, rand_cell) < 3))
 		coinPosition = Vector2D((float)(rand() % num_cell_x), (float)(rand() % num_cell_y));
-	
+
 	// PathFollowing next Target
 	currentTarget = Vector2D(0, 0);
 	currentTargetIndex = -1;
+
+	// A* Algorithm
+	agents[0]->vector_costs.clear();
+	agents[0]->frontierCount.clear();
+	astar = agents[0]->AStar(pix2cell(start), coinPosition, graph, true);
+	for (unsigned int i = 0; i < astar.size(); i++) {
+		path.points.push_back(cell2pix(astar[i]));
+	}
 
 }
 
@@ -53,52 +63,53 @@ void ScenePlanning::update(float dtime, SDL_Event *event)
 	/* Keyboard & Mouse events */
 	switch (event->type) {
 	case SDL_KEYDOWN:
+		/*if (event->key.keysym.scancode == SDL_SCANCODE_C)
+			draw_costs = !draw_costs;
+		else if (event->key.keysym.scancode == SDL_SCANCODE_F)
+			draw_frontier = !draw_frontier;
+		else if (event->key.keysym.scancode == SDL_SCANCODE_L)
+			draw_lines = !draw_lines;
+		else if (event->key.keysym.scancode == SDL_SCANCODE_M)
+			draw_map = !draw_map;
+		else if (event->key.keysym.scancode == SDL_SCANCODE_N)
+			draw_numbers = !draw_numbers;*/
 		if (event->key.keysym.scancode == SDL_SCANCODE_SPACE)
 			draw_grid = !draw_grid;
-		break;
-	case SDL_MOUSEMOTION:
-	case SDL_MOUSEBUTTONDOWN:
-		if (event->button.button == SDL_BUTTON_LEFT)
-		{
-			Vector2D cell = pix2cell(Vector2D((float)(event->button.x), (float)(event->button.y)));
-			if (isValidCell(cell))
-			{
-				if (path.points.size() > 0)
-					if (path.points[path.points.size() - 1] == cell2pix(cell))
-						break;
-
-				path.points.push_back(cell2pix(cell));
-			}
-		}
 		break;
 	default:
 		break;
 	}
-	if ((currentTargetIndex == -1) && (path.points.size()>0))
+	if ((currentTargetIndex == -1) && (path.points.size() > 0))
 		currentTargetIndex = 0;
 
-	if (currentTargetIndex >= 0)
-	{	
+	if (currentTargetIndex >= 0) {
 		float dist = Vector2D::Distance(agents[0]->getPosition(), path.points[currentTargetIndex]);
-		if (dist < path.ARRIVAL_DISTANCE)
-		{
-			if (currentTargetIndex == path.points.size() - 1)
-			{
-				if (dist < 3)
-				{
-					path.points.clear();
+		if (dist < path.ARRIVAL_DISTANCE) {
+			if (currentTargetIndex == path.points.size() - 1) {
+				if (dist < 3) {
 					currentTargetIndex = -1;
-					agents[0]->setVelocity(Vector2D(0,0));
+					agents[0]->setVelocity(Vector2D(0, 0));
 					// if we have arrived to the coin, replace it ina random cell!
-					if (pix2cell(agents[0]->getPosition()) == coinPosition)
-					{
+					if (pix2cell(agents[0]->getPosition()) == coinPosition) {
+
 						coinPosition = Vector2D(-1, -1);
-						while ((!isValidCell(coinPosition)) || (Vector2D::Distance(coinPosition, pix2cell(agents[0]->getPosition()))<3))
+
+						while ((!isValidCell(coinPosition)) || (Vector2D::Distance(coinPosition, pix2cell(agents[0]->getPosition())) < 3))
 							coinPosition = Vector2D((float)(rand() % num_cell_x), (float)(rand() % num_cell_y));
+						agents[0]->setPosition(path.points.back());
+						start = agents[0]->getPosition();
+						path.points.clear();
+
+						// A* Algorithm
+						agents[0]->vector_costs.clear();
+						agents[0]->frontierCount.clear();
+						astar = agents[0]->AStar(pix2cell(start), coinPosition, graph, true);
+						for (unsigned int i = 0; i < astar.size(); i++) {
+							path.points.push_back(cell2pix(astar[i]));
+						}
 					}
 				}
-				else
-				{
+				else {
 					Vector2D steering_force = agents[0]->Behavior()->Arrive(agents[0], currentTarget, path.ARRIVAL_DISTANCE, dtime);
 					agents[0]->update(steering_force, dtime, event);
 				}
@@ -110,10 +121,9 @@ void ScenePlanning::update(float dtime, SDL_Event *event)
 		currentTarget = path.points[currentTargetIndex];
 		Vector2D steering_force = agents[0]->Behavior()->Seek(agents[0], currentTarget, dtime);
 		agents[0]->update(steering_force, dtime, event);
-	} 
-	else
-	{
-		agents[0]->update(Vector2D(0,0), dtime, event);
+	}
+	else {
+		agents[0]->update(Vector2D(0, 0), dtime, event);
 	}
 }
 
@@ -122,7 +132,7 @@ void ScenePlanning::draw()
 	drawMaze();
 	drawCoin();
 
-
+	// Draw grid
 	if (draw_grid)
 	{
 		SDL_SetRenderDrawColor(TheApp::Instance()->getRenderer(), 255, 255, 255, 127);
@@ -136,12 +146,19 @@ void ScenePlanning::draw()
 		}
 	}
 
+	// Draw path
 	for (int i = 0; i < (int)path.points.size(); i++)
 	{
 		draw_circle(TheApp::Instance()->getRenderer(), (int)(path.points[i].x), (int)(path.points[i].y), 15, 255, 255, 0, 255);
 		if (i > 0)
 			SDL_RenderDrawLine(TheApp::Instance()->getRenderer(), (int)(path.points[i - 1].x), (int)(path.points[i - 1].y), (int)(path.points[i].x), (int)(path.points[i].y));
 	}
+
+	// Draw floors
+	/*for (auto it = graph.allConnections.begin(); it != graph.allConnections.end(); ++it) {
+		draw_circle(TheApp::Instance()->getRenderer(), cell2pix((*it).first).x, cell2pix((*it).first).y, 15, 0, 0, 255, 255);
+	}*/
+
 
 	draw_circle(TheApp::Instance()->getRenderer(), (int)currentTarget.x, (int)currentTarget.y, 15, 255, 0, 0, 255);
 
@@ -233,21 +250,38 @@ void ScenePlanning::initMaze()
 		}
 	}
 
+	// Add connections to all cells of the game (that are not walls)
+	//40 X CELLS 24 Y CELLS
+	for (int i = 0; i < num_cell_x; i++) {
+		for (int j = 0; j < num_cell_y; j++) {
+
+			if (terrain[i][j] == 1) {
+
+				if (j < num_cell_y - 1 && terrain[i][j + 1] != 0) {
+					graph.AddConnection(Vector2D(i, j), Vector2D(i, j + 1));
+				}
+
+				if (i < num_cell_x - 1 && terrain[i + 1][j] != 0) {
+					graph.AddConnection(Vector2D(i, j), Vector2D(i + 1, j));
+				}
+
+				if (j > 0 && terrain[i][j - 1] != 0) {
+					graph.AddConnection(Vector2D(i, j), Vector2D(i, j - 1));
+				}
+
+				if (i > 0 && terrain[i - 1][j] != 0) {
+					graph.AddConnection(Vector2D(i, j), Vector2D(i - 1, j));
+				}
+
+			}
+		}
+	}
+
 }
 
-bool ScenePlanning::loadTextures(char* filename_bg, char* filename_coin)
+bool ScenePlanning::loadTextures(char* filename_coin)
 {
-	SDL_Surface *image = IMG_Load(filename_bg);
-	if (!image) {
-		cout << "IMG_Load: " << IMG_GetError() << endl;
-		return false;
-	}
-	background_texture = SDL_CreateTextureFromSurface(TheApp::Instance()->getRenderer(), image);
-
-	if (image)
-		SDL_FreeSurface(image);
-
-	image = IMG_Load(filename_coin);
+	SDL_Surface *image = IMG_Load(filename_coin);
 	if (!image) {
 		cout << "IMG_Load: " << IMG_GetError() << endl;
 		return false;
