@@ -1,4 +1,5 @@
 #include "ScenePlanning.h"
+#include "State.h"
 
 using namespace std;
 
@@ -42,6 +43,18 @@ ScenePlanning::ScenePlanning()
 	for (unsigned int i = 0; i < astar.size(); i++) {
 		path.points.push_back(cell2pix(astar[i]));
 	}
+
+	Mining mining;
+	mining.Init(agents[0], 0);
+
+	Bank bank;
+	bank.Init(agents[0], 1000);
+
+	Chill chill;
+	chill.Init(agents[0], 1000);
+
+	Sleep sleep;
+	sleep.Init(agents[0], 5000);
 
 }
 

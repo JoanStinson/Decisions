@@ -134,8 +134,10 @@
     <ClCompile Include="..\src\Agent.cpp" />
     <ClCompile Include="..\src\Graph.cpp" />
     <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\Mining.cpp" />
     <ClCompile Include="..\src\ScenePlanning.cpp" />
     <ClCompile Include="..\src\SDL_SimpleApp.cpp" />
+    <ClCompile Include="..\src\State.cpp" />
     <ClCompile Include="..\src\SteeringBehavior.cpp" />
     <ClCompile Include="..\src\utils.cpp" />
   </ItemGroup>
@@ -144,6 +146,7 @@
     <ClInclude Include="..\src\Graph.h" />
     <ClInclude Include="..\src\Path.h" />
     <ClInclude Include="..\src\ScenePlanning.h" />
+    <ClInclude Include="..\src\State.h" />
     <ClInclude Include="..\src\SteeringBehavior.h" />
     <ClInclude Include="..\src\utils.h" />
     <ClInclude Include="..\src\Scene.h" />
