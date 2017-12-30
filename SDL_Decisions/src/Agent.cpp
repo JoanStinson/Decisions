@@ -27,6 +27,10 @@ Agent::~Agent()
 		delete (steering_behavior);
 }
 
+void Agent::SwitchState(State * state) {
+	currentState = state;
+}
+
 float Agent::RandomFloat(float a, float b) {
 	float random = ((float)rand()) / (float)RAND_MAX;
 	float diff = b - a;

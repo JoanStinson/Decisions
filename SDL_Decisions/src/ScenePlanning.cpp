@@ -6,7 +6,7 @@ using namespace std;
 
 ScenePlanning::ScenePlanning()
 {
-	draw_grid = false;
+	draw_grid = true;
 
 	num_cell_x = SRC_WIDTH / CELL_SIZE;
 	num_cell_y = SRC_HEIGHT / CELL_SIZE;
@@ -37,24 +37,25 @@ ScenePlanning::ScenePlanning()
 	currentTargetIndex = -1;
 
 	// A* Algorithm
-	agents[0]->vector_costs.clear();
+	
+	/*agents[0]->vector_costs.clear();
 	agents[0]->frontierCount.clear();
 	astar = agents[0]->AStar(pix2cell(start), coinPosition, graph, true);
 	for (unsigned int i = 0; i < astar.size(); i++) {
 		path.points.push_back(cell2pix(astar[i]));
 	}
 
-	Mining mining;
+	Mine mining;
 	mining.Init(agents[0], 0);
 
 	Bank bank;
 	bank.Init(agents[0], 1000);
 
-	Chill chill;
+	Saloon chill;
 	chill.Init(agents[0], 1000);
 
-	Sleep sleep;
-	sleep.Init(agents[0], 5000);
+	Home sleep;
+	sleep.Init(agents[0], 5000);*/
 
 }
 
@@ -114,12 +115,12 @@ void ScenePlanning::update(float dtime, SDL_Event *event)
 						path.points.clear();
 
 						// A* Algorithm
-						agents[0]->vector_costs.clear();
+						/*agents[0]->vector_costs.clear();
 						agents[0]->frontierCount.clear();
 						astar = agents[0]->AStar(pix2cell(start), coinPosition, graph, true);
 						for (unsigned int i = 0; i < astar.size(); i++) {
 							path.points.push_back(cell2pix(astar[i]));
-						}
+						}*/
 					}
 				}
 				else {

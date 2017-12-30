@@ -16,9 +16,10 @@
 #include <time.h>       
 using namespace std;
 
-class Agent
-{
+class Agent {
+
 	friend class SteeringBehavior;
+	friend class State;
 
 private:
 	SteeringBehavior *steering_behavior;
@@ -44,6 +45,14 @@ private:
 public:
 	Agent();
 	~Agent();
+
+	// Our stuff
+	State* currentState;
+	State* home;
+	State* mine;
+	State* bank;
+	State* saloon;
+	inline void SwitchState(State* state);
 
 	// Utils
 	vector<Vector2D> frontierCount;

@@ -1,17 +1,15 @@
 #include "Graph.h"
 
-Graph::Graph() {
-}
+Graph::Graph() {}
 
-Graph::~Graph() {
-}
+Graph::~Graph() {}
 
 void Graph::AddConnection(Vector2D from, Vector2D to) {
 	allConnections.emplace(from, to);
 }
 
-vector<Vector2D> Graph::GetConnections(Vector2D from) {
-	vector<Vector2D> neighbors;
+std::vector<Vector2D> Graph::GetConnections(Vector2D from) {
+	std::vector<Vector2D> neighbors;
 
 	// Search for from inside the list of all connections
 	for (auto it = allConnections.begin(); it != allConnections.end(); ++it) {
