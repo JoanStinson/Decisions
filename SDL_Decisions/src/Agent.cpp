@@ -1,6 +1,5 @@
 #include "Agent.h"
 #include "ScenePlanning.h"
-using namespace std;
 
 Agent::Agent() : sprite_texture(0),
                  position(Vector2D(100, 100)),
@@ -17,12 +16,13 @@ Agent::Agent() : sprite_texture(0),
 	             draw_sprite(false)
 {
 	steering_behavior = new SteeringBehavior;
-	home = new Home;
-	saloon = new Saloon;
-	mine = new Mine;
-	bank = new Bank;
-	tireness = 0;
-	gold = 0;
+	bankState = new BankState;
+	homeState = new HomeState;
+	mineState = new MineState;
+	saloonState = new SaloonState;
+	objectivePosition = Vector2D(593, 145);
+	fatigue = 0;
+	pockets = 0;
 }
 
 Agent::~Agent()
@@ -163,42 +163,11 @@ bool Agent::loadSpriteTexture(char* filename, int _num_frames)
 	return true;
 }
 
-float Agent::RandomFloat(float a, float b) {
-	float random = ((float)rand()) / (float)RAND_MAX;
-	float diff = b - a;
-	float r = random * diff;
-	return a + r;
-}
-
 float Agent::Heuristic(Vector2D a, Vector2D b) {
 	return abs(a.x - b.x) + abs(a.y - b.y);
 }
 
-void Agent::PrintStatistics(int a) {
-	// Current
-	current = a;
-
-	// Min
-	if (min == 0) min = a;
-	else if (a < min) min = a;
-
-	// Max
-	if (max == 0) max = a;
-	else if (a > max) max = a;
-
-	// Average
-	sizes.push_back(a);
-	int temp = 0;
-	for (int i = 0; i < sizes.size(); i++) {
-		temp += sizes[i];
-	}
-	average = temp / sizes.size();
-
-	// Print
-	cout << "\r" << "  Current: " << current << " Min: " << min << " Max: " << max << " Average: " << average << "            ";
-}
-
-vector<Vector2D> Agent::AStar(Vector2D start, Vector2D goal, Graph graph, bool show_nodes) {
+vector<Vector2D> Agent::AStar(Vector2D start, Vector2D goal, Graph graph) {
 	PriorityQueue<Vector2D, float> frontier;
 	frontier.put(start, 0.f);
 
@@ -219,11 +188,6 @@ vector<Vector2D> Agent::AStar(Vector2D start, Vector2D goal, Graph graph, bool s
 		current = frontier.get();
 
 		if (current == goal) {
-			if (show_nodes) {
-				int size = frontierCount.size();
-				PrintStatistics(size);
-			}
-			else cout << "\r" << "           " << "    " << "      " << "    " << "      " << "    " << "          " << "    " << "            ";
 			path.push_back(current);
 			while (current != start) {
 				current = came_from[current];
@@ -239,31 +203,24 @@ vector<Vector2D> Agent::AStar(Vector2D start, Vector2D goal, Graph graph, bool s
 		for (unsigned int i = 0; i < neighbors.size(); i++) {
 			visited = false;
 			next = neighbors[i];
-			randCost = (rand() % 6) + 1; //RandomFloat(0, 7);
+			randCost = (rand() % 6) + 1; 
 			new_cost = cost_so_far[current] + randCost; //TODO implement GetCost method to do + 'graph.GetCost(current, next)' instead of rand
 
-			for (unsigned int j = 0; j < cost_so_far.size(); j++) {
+			//for (unsigned int j = 0; j < cost_so_far.size(); j++) {
 				// If next in cost_so_far 
 				if (cost_so_far.find(next) != cost_so_far.end()) {
-					if (new_cost > cost_so_far[next]) { // if 'new_cost < cost_so_far[next]' visited = false perque el volem afegir, if 'new_cost > cost_so_far[next]' nol volem per tant visited = false
+					if (new_cost > cost_so_far[next])  // if 'new_cost < cost_so_far[next]' visited = false perque el volem afegir, if 'new_cost > cost_so_far[next]' nol volem per tant visited = false
 						visited = true;
-					}
 				}
 				// If next not in cost_so_far
-				else {
-					visited = false;
-				}
-
-			}
+				else visited = false;
+			//}
 
 			if (!visited) {
 				cost_so_far[next] = new_cost;
 				priority = new_cost + Heuristic(goal, next);
 				frontier.put(next, priority);
 				came_from[next] = current;
-				//Count :)
-				frontierCount.push_back(next);
-				vector_costs.push_back(std::make_pair(next, randCost));
 			}
 		}
 	}

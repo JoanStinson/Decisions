@@ -1,5 +1,4 @@
 #include "ScenePlanning.h"
-using namespace std;
 
 ScenePlanning::ScenePlanning() {
 
@@ -8,7 +7,7 @@ ScenePlanning::ScenePlanning() {
 	num_cell_x = SRC_WIDTH / CELL_SIZE;
 	num_cell_y = SRC_HEIGHT / CELL_SIZE;
 	initMaze();
-	loadTextures("../res/coin.png", "../res/maze.png");
+	loadTextures("../res/coin.png", "../res/maze.jpg");
 
 	srand((unsigned int)time(NULL));
 
@@ -29,9 +28,11 @@ ScenePlanning::ScenePlanning() {
 		coinPosition = Vector2D((float)(rand() % num_cell_x), (float)(rand() % num_cell_y));
 
 	// PathFollowing next Target
+	isFirstState = true;
+	pastLocation = Vector2D(593, 145);
 	currentTarget = Vector2D(0, 0);
 	currentTargetIndex = -1;
-	agents[0]->currentState = agents[0]->home;
+	agents[0]->SwitchState(agents[0]->mineState);
 
 	/* A* Algorithm
 	agents[0]->vector_costs.clear();
@@ -54,16 +55,7 @@ ScenePlanning::~ScenePlanning() {
 }
 
 void ScenePlanning::update(float dtime, SDL_Event *event) {
-
-	if (dtime >(60.f / 1000.f)) 
-		dtime = (60.f / 1000.f);
 	
-	if (agents[0]->goalPos != prevPos || first) {
-		path.points.push_back(agents[0]->goalPos);
-		prevPos = agents[0]->goalPos;
-		first = false;
-	}
-
 	/* Keyboard & Mouse events */
 	switch (event->type) {
 	case SDL_KEYDOWN:
@@ -73,6 +65,15 @@ void ScenePlanning::update(float dtime, SDL_Event *event) {
 	default:
 		break;
 	}
+
+	if (isFirstState || agents[0]->objectivePosition != pastLocation) {
+		isFirstState = false;
+		if (!isFirstState) {
+			path.points.push_back(agents[0]->objectivePosition);
+			pastLocation = agents[0]->objectivePosition;
+		}
+	}
+
 	if ((currentTargetIndex == -1) && (path.points.size() > 0)) 
 		currentTargetIndex = 0;
 
@@ -89,7 +90,7 @@ void ScenePlanning::update(float dtime, SDL_Event *event) {
 					path.points.clear();
 					currentTargetIndex = -1;
 					agents[0]->setVelocity(Vector2D(0, 0));
-					agents[0]->currentState->Enter(agents[0], 250);
+					agents[0]->currentState->Init(agents[0], 250);
 
 					// if we have arrived to the coin, replace it ina random cell!
 					if (pix2cell(agents[0]->getPosition()) == coinPosition) {
@@ -133,7 +134,7 @@ void ScenePlanning::update(float dtime, SDL_Event *event) {
 void ScenePlanning::draw() {
 
 	drawMaze();
-	drawCoin();
+	//drawCoin();
 
 	// Draw grid
 	if (draw_grid) {
@@ -153,11 +154,6 @@ void ScenePlanning::draw() {
 			SDL_RenderDrawLine(TheApp::Instance()->getRenderer(), (int)(path.points[i - 1].x), (int)(path.points[i - 1].y), (int)(path.points[i].x), (int)(path.points[i].y));
 	}
 
-	// Draw floors
-	/*for (auto it = graph.allConnections.begin(); it != graph.allConnections.end(); ++it) {
-		draw_circle(TheApp::Instance()->getRenderer(), cell2pix((*it).first).x, cell2pix((*it).first).y, 15, 0, 0, 255, 255);
-	}*/
-
 	draw_circle(TheApp::Instance()->getRenderer(), (int)currentTarget.x, (int)currentTarget.y, 15, 255, 0, 0, 255);
 	agents[0]->draw();
 }
@@ -168,13 +164,15 @@ const char* ScenePlanning::getTitle() {
 
 void ScenePlanning::drawMaze() {
 
+	SDL_RenderCopy(TheApp::Instance()->getRenderer(), background_texture, NULL, NULL);
+
 	if (draw_grid) {
 		SDL_SetRenderDrawColor(TheApp::Instance()->getRenderer(), 0, 0, 255, 255);
 		for (unsigned int i = 0; i < maze_rects.size(); i++)
 			SDL_RenderFillRect(TheApp::Instance()->getRenderer(), &maze_rects[i]);		
 	}
 	else {
-		SDL_RenderCopy(TheApp::Instance()->getRenderer(), background_texture, NULL, NULL );
+		//SDL_RenderCopy(TheApp::Instance()->getRenderer(), background_texture, NULL, NULL );
 	}
 }
 
@@ -242,28 +240,7 @@ void ScenePlanning::initMaze() {
 	}
 
 	// Add connections to all cells of the game (that are not walls)
-	//40 X CELLS 24 Y CELLS
-	for (int i = 0; i < num_cell_x; i++) {
-		for (int j = 0; j < num_cell_y; j++) {
-
-			if (terrain[i][j] == 1) {
-				Vector2D current = Vector2D(i, j);
-
-				if (j < num_cell_y - 1 && terrain[i][j + 1] != 0) 
-					graph.AddConnection(current, Vector2D(i, j + 1));
-
-				if (i < num_cell_x - 1 && terrain[i + 1][j] != 0) 
-					graph.AddConnection(current, Vector2D(i + 1, j));
-
-				if (j > 0 && terrain[i][j - 1] != 0) 
-					graph.AddConnection(current, Vector2D(i, j - 1));
-
-				if (i > 0 && terrain[i - 1][j] != 0) 
-					graph.AddConnection(current, Vector2D(i - 1, j));
-
-			}
-		}
-	}
+	InitConnections();
 }
 
 bool ScenePlanning::loadTextures(char* filename_coin, char* filename_bg) {
@@ -303,4 +280,30 @@ bool ScenePlanning::isValidCell(Vector2D cell) {
 	if ((cell.x < 0) || (cell.y < 0) || (cell.x >= terrain.size()) || (cell.y >= terrain[0].size()) )
 		return false;
 	return !(terrain[(unsigned int)cell.x][(unsigned int)cell.y] == 0);
+}
+
+void ScenePlanning::InitConnections() {
+	// Add connections to all cells of the game (that are not walls)
+	//40 X CELLS 24 Y CELLS
+	for (int i = 0; i < num_cell_x; i++) {
+		for (int j = 0; j < num_cell_y; j++) {
+
+			if (terrain[i][j] == 1) {
+				Vector2D current = Vector2D(i, j);
+
+				if (j < num_cell_y - 1 && terrain[i][j + 1] != 0)
+					graph.AddConnection(current, Vector2D(i, j + 1));
+
+				if (i < num_cell_x - 1 && terrain[i + 1][j] != 0)
+					graph.AddConnection(current, Vector2D(i + 1, j));
+
+				if (j > 0 && terrain[i][j - 1] != 0)
+					graph.AddConnection(current, Vector2D(i, j - 1));
+
+				if (i > 0 && terrain[i - 1][j] != 0)
+					graph.AddConnection(current, Vector2D(i - 1, j));
+
+			}
+		}
+	}
 }

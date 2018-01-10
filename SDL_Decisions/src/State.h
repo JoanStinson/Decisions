@@ -13,15 +13,12 @@ public:
 	State();
 	~State();
 
-	void Enter(Agent* agent, float delayTime);
+	void Init(Agent* agent, Uint32 delayTime);
 	virtual void Update() = 0;
-	void Exit(State* state);
+	void Quit(State* state);
 
 protected:
 	Agent* agent;
-	float delayTime;
-	Vector2D bankPos;
-	Vector2D homePos;
-	Vector2D minePos;
-	Vector2D saloonPos;
+	Uint32 delayTime;
+	Vector2D bankPosition, homePosition, minePosition, saloonPosition;
 };

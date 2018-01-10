@@ -43,32 +43,17 @@ public:
 	bool loadSpriteTexture(char* filename, int num_frames=1);
 
 	// Our stuff
-	float RandomFloat(float a, float b);
 	float Heuristic(Vector2D a, Vector2D b);
-	void PrintStatistics(int a);
-	vector<Vector2D> AStar(Vector2D start, Vector2D goal, Graph graph, bool show_nodes);
+	vector<Vector2D> AStar(Vector2D start, Vector2D goal, Graph graph);
 	void SwitchState(State* state);
 
-	vector<Vector2D> frontierCount;
-	vector<pair<Vector2D, float>> vector_costs;
-	//TODO change variable names
-	State* currentState;
-	State* home;
-	State* mine;
-	State* bank;
-	State* saloon;
-	
-	int gold;
+	int pockets;
 	int wealth;
-	int tireness;
-	int totalWealth;
-	float thirst;
-	bool full;
-	bool thirsty;
-	bool rested;
-	bool wealthy;
-	Vector2D initPos;
-	Vector2D goalPos = Vector2D(656, 624);
+	int fatigue;
+	int thirst;
+
+	Vector2D objectivePosition, firstLocation;
+	State *bankState, *homeState, *mineState, *saloonState, *currentState;
 
 private:
 	SteeringBehavior * steering_behavior;

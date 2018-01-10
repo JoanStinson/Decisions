@@ -1,21 +1,21 @@
 #include "State.h"
 
-State::State() {}
+State::State() {
+	bankPosition = Vector2D(209, 656);
+	homePosition = Vector2D(656, 656);
+	minePosition = Vector2D(656, 145);
+	saloonPosition = Vector2D(1042, 656);
+}
 
 State::~State() {
 	delete agent;
 }
 
-void State::Enter(Agent * agent, float delayTime) {
+void State::Init(Agent * agent, Uint32 delayTime) {
 	this->agent = agent;
 	this->delayTime = delayTime;
-
-	bankPos = Vector2D(209, 624);
-	homePos = Vector2D(656, 624);
-	minePos = Vector2D(82, 177);
-	saloonPos = Vector2D(1038, 624);
 }
 
-void State::Exit(State * state) {
+void State::Quit(State * state) {
 	agent->SwitchState(state);
 }

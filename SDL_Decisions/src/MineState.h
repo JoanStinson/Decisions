@@ -1,11 +1,11 @@
 #pragma once
 #include "State.h"
 
-class Home : public State {
+class MineState : public State {
 
 public:
-	Home();
-	~Home();
+	MineState();
+	~MineState();
 
 	void Update();
 };

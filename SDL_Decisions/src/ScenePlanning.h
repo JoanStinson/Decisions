@@ -7,10 +7,10 @@
 #include "Graph.h"
 #include <iostream>
 #include <time.h>
-#include "Bank.h"
-#include "Home.h"
-#include "Mine.h"
-#include "Saloon.h"
+#include "BankState.h"
+#include "HomeState.h"
+#include "MineState.h"
+#include "SaloonState.h"
 using namespace std;
 
 class ScenePlanning : public Scene {
@@ -23,7 +23,7 @@ public:
 	const char* getTitle();
 
 private:
-	std::vector<Agent*> agents;
+	vector<Agent*> agents;
 	Vector2D coinPosition;
 	Vector2D currentTarget;
 	int currentTargetIndex;
@@ -38,15 +38,16 @@ private:
 	SDL_Texture *coin_texture;
 	void initMaze();
 	bool loadTextures(char* filename_coin, char* filename_bg);
-	std::vector< std::vector<int> > terrain;
+	vector<vector<int>> terrain;
 	Vector2D cell2pix(Vector2D cell);
 	Vector2D pix2cell(Vector2D pix);
 	bool isValidCell(Vector2D cell);
 
 	// Our stuff
+	void InitConnections();
 	Graph graph;
 	Vector2D start;
 	vector<Vector2D> astar;
-	Vector2D prevPos = Vector2D(656, 624);
-	bool first = true;
+	Vector2D pastLocation;
+	bool isFirstState;
 };

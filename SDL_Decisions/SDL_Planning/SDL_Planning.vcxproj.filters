@@ -39,16 +39,16 @@
     <ClCompile Include="..\src\State.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Mine.cpp">
+    <ClCompile Include="..\src\BankState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Bank.cpp">
+    <ClCompile Include="..\src\HomeState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Saloon.cpp">
+    <ClCompile Include="..\src\MineState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Home.cpp">
+    <ClCompile Include="..\src\SaloonState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -83,16 +83,16 @@
     <ClInclude Include="..\src\State.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Mine.h">
+    <ClInclude Include="..\src\BankState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Bank.h">
+    <ClInclude Include="..\src\HomeState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Saloon.h">
+    <ClInclude Include="..\src\MineState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Home.h">
+    <ClInclude Include="..\src\SaloonState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

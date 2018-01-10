@@ -132,12 +132,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Agent.cpp" />
-    <ClCompile Include="..\src\Bank.cpp" />
+    <ClCompile Include="..\src\BankState.cpp" />
     <ClCompile Include="..\src\Graph.cpp" />
-    <ClCompile Include="..\src\Home.cpp" />
+    <ClCompile Include="..\src\HomeState.cpp" />
     <ClCompile Include="..\src\main.cpp" />
-    <ClCompile Include="..\src\Mine.cpp" />
-    <ClCompile Include="..\src\Saloon.cpp" />
+    <ClCompile Include="..\src\MineState.cpp" />
+    <ClCompile Include="..\src\SaloonState.cpp" />
     <ClCompile Include="..\src\ScenePlanning.cpp" />
     <ClCompile Include="..\src\SDL_SimpleApp.cpp" />
     <ClCompile Include="..\src\State.cpp" />
@@ -146,12 +146,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Agent.h" />
-    <ClInclude Include="..\src\Bank.h" />
+    <ClInclude Include="..\src\BankState.h" />
     <ClInclude Include="..\src\Graph.h" />
-    <ClInclude Include="..\src\Home.h" />
-    <ClInclude Include="..\src\Mine.h" />
+    <ClInclude Include="..\src\HomeState.h" />
+    <ClInclude Include="..\src\MineState.h" />
     <ClInclude Include="..\src\Path.h" />
-    <ClInclude Include="..\src\Saloon.h" />
+    <ClInclude Include="..\src\SaloonState.h" />
     <ClInclude Include="..\src\ScenePlanning.h" />
     <ClInclude Include="..\src\State.h" />
     <ClInclude Include="..\src\SteeringBehavior.h" />
