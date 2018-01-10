@@ -1,8 +1,5 @@
 #include "ScenePlanning.h"
-#include "State.h"
-
 using namespace std;
-
 
 ScenePlanning::ScenePlanning()
 {
@@ -19,7 +16,6 @@ ScenePlanning::ScenePlanning()
 	agent->loadSpriteTexture("../res/soldier.png", 4);
 	agents.push_back(agent);
 
-
 	// Set agent position coords to the center of a random cell
 	Vector2D rand_cell(-1, -1);
 	while (!isValidCell(rand_cell))
@@ -35,28 +31,15 @@ ScenePlanning::ScenePlanning()
 	// PathFollowing next Target
 	currentTarget = Vector2D(0, 0);
 	currentTargetIndex = -1;
+	agents[0]->currentState = agents[0]->home;
 
-	// A* Algorithm
-	
-	/*agents[0]->vector_costs.clear();
+	/* A* Algorithm
+	agents[0]->vector_costs.clear();
 	agents[0]->frontierCount.clear();
 	astar = agents[0]->AStar(pix2cell(start), coinPosition, graph, true);
 	for (unsigned int i = 0; i < astar.size(); i++) {
 		path.points.push_back(cell2pix(astar[i]));
-	}
-
-	Mine mining;
-	mining.Init(agents[0], 0);
-
-	Bank bank;
-	bank.Init(agents[0], 1000);
-
-	Saloon chill;
-	chill.Init(agents[0], 1000);
-
-	Home sleep;
-	sleep.Init(agents[0], 5000);*/
-
+	}*/
 }
 
 ScenePlanning::~ScenePlanning()
@@ -74,45 +57,48 @@ ScenePlanning::~ScenePlanning()
 
 void ScenePlanning::update(float dtime, SDL_Event *event)
 {
+	if (dtime >(60.f / 1000.f)) {
+		dtime = (60.f / 1000.f);
+	}
+	if (agents[0]->goalPos != prevPos || first) {
+		path.points.push_back(agents[0]->goalPos);
+		prevPos = agents[0]->goalPos;
+		first = false;
+	}
 	/* Keyboard & Mouse events */
 	switch (event->type) {
 	case SDL_KEYDOWN:
-		/*if (event->key.keysym.scancode == SDL_SCANCODE_C)
-			draw_costs = !draw_costs;
-		else if (event->key.keysym.scancode == SDL_SCANCODE_F)
-			draw_frontier = !draw_frontier;
-		else if (event->key.keysym.scancode == SDL_SCANCODE_L)
-			draw_lines = !draw_lines;
-		else if (event->key.keysym.scancode == SDL_SCANCODE_M)
-			draw_map = !draw_map;
-		else if (event->key.keysym.scancode == SDL_SCANCODE_N)
-			draw_numbers = !draw_numbers;*/
 		if (event->key.keysym.scancode == SDL_SCANCODE_SPACE)
 			draw_grid = !draw_grid;
 		break;
 	default:
 		break;
 	}
-	if ((currentTargetIndex == -1) && (path.points.size() > 0))
-		currentTargetIndex = 0;
+	if ((currentTargetIndex == -1) && (path.points.size() > 0)) currentTargetIndex = 0;
 
 	if (currentTargetIndex >= 0) {
+
 		float dist = Vector2D::Distance(agents[0]->getPosition(), path.points[currentTargetIndex]);
 		if (dist < path.ARRIVAL_DISTANCE) {
+
 			if (currentTargetIndex == path.points.size() - 1) {
+
 				if (dist < 3) {
+					path.points.clear();
 					currentTargetIndex = -1;
 					agents[0]->setVelocity(Vector2D(0, 0));
+					agents[0]->currentState->Enter(agents[0]);
+
 					// if we have arrived to the coin, replace it ina random cell!
 					if (pix2cell(agents[0]->getPosition()) == coinPosition) {
-
 						coinPosition = Vector2D(-1, -1);
-
+						
 						while ((!isValidCell(coinPosition)) || (Vector2D::Distance(coinPosition, pix2cell(agents[0]->getPosition())) < 3))
 							coinPosition = Vector2D((float)(rand() % num_cell_x), (float)(rand() % num_cell_y));
-						agents[0]->setPosition(path.points.back());
+
+						/*agents[0]->setPosition(path.points.back());
 						start = agents[0]->getPosition();
-						path.points.clear();
+						path.points.clear();*/
 
 						// A* Algorithm
 						/*agents[0]->vector_costs.clear();
@@ -138,6 +124,7 @@ void ScenePlanning::update(float dtime, SDL_Event *event)
 	}
 	else {
 		agents[0]->update(Vector2D(0, 0), dtime, event);
+		agents[0]->currentState->Update(agents[0]);
 	}
 }
 
@@ -173,7 +160,6 @@ void ScenePlanning::draw()
 		draw_circle(TheApp::Instance()->getRenderer(), cell2pix((*it).first).x, cell2pix((*it).first).y, 15, 0, 0, 255, 255);
 	}*/
 
-
 	draw_circle(TheApp::Instance()->getRenderer(), (int)currentTarget.x, (int)currentTarget.y, 15, 255, 0, 0, 255);
 
 	agents[0]->draw();
@@ -181,7 +167,7 @@ void ScenePlanning::draw()
 
 const char* ScenePlanning::getTitle()
 {
-	return "SDL Steering Behaviors :: PathFinding1 Demo";
+	return "SDL Decisions :: FSM Function Pointer Style";
 }
 
 void ScenePlanning::drawMaze()

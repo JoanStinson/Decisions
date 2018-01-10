@@ -4,17 +4,30 @@ Mine::Mine() {}
 
 Mine::~Mine() {}
 
-void Mine::Update() {
-	//TODO fer aixo bé, de moment he ficat un exemple:
-	// if gold == 3
-		//exit to saloon
-	// if tired == 9
-		//exit to home
+inline void Mine::Enter(Agent * agent) {
+	cout << "Entered Mine State" << endl;
+}
 
-	goldCount++;
+void Mine::Update(Agent * agent) {
+	cout << "Enter Mine and Dig" << endl;
+	SDL_Delay(250);
 
-	if (goldCount >= maxGold) {
-		UpdateTarget(209, 624);
-		Exit(agent->bank);
+	agent->gold++;
+	agent->tireness++;
+	agent->thirst += 0.5f;
+
+	if (agent->thirst >= 5) {
+		cout << "Thirsty" << endl;
+		agent->goalPos = Vector2D(1038, 624);
+		Exit(agent, agent->saloon);
 	}
+	else if (agent->gold == 3) {
+		cout << "Pockets Full" << endl;
+		agent->goalPos = Vector2D(209, 624);
+		Exit(agent, agent->bank);
+	}
+}
+
+inline void Mine::Exit(Agent * agent, State * state) {
+	agent->SwitchState(state);
 }

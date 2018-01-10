@@ -1,5 +1,5 @@
 #include "Agent.h"
-
+#include "ScenePlanning.h"
 using namespace std;
 
 Agent::Agent() : sprite_texture(0),
@@ -17,6 +17,12 @@ Agent::Agent() : sprite_texture(0),
 	             draw_sprite(false)
 {
 	steering_behavior = new SteeringBehavior;
+	home = new Home;
+	saloon = new Saloon;
+	mine = new Mine;
+	bank = new Bank;
+	tireness = 0;
+	gold = 0;
 }
 
 Agent::~Agent()
@@ -70,8 +76,6 @@ vector<Vector2D> Agent::AStar(Vector2D start, Vector2D goal, Graph graph, bool s
 	PriorityQueue<Vector2D, float> frontier;
 	frontier.put(start, 0.f);
 
-
-
 	unordered_map<Vector2D, Vector2D> came_from;
 	came_from[start] = NULL;
 
@@ -105,8 +109,6 @@ vector<Vector2D> Agent::AStar(Vector2D start, Vector2D goal, Graph graph, bool s
 		}
 
 		neighbors = graph.GetConnections(current);
-
-
 
 		for (unsigned int i = 0; i < neighbors.size(); i++) {
 			visited = false;

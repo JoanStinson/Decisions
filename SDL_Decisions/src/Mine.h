@@ -7,9 +7,7 @@ public:
 	Mine();
 	~Mine();
 
-	void Update() override;
-
-private:
-	int goldCount;
-	int maxGold;
+	void Enter(Agent* agent);
+	void Update(Agent* agent);
+	void Exit(Agent* agent, State* state);
 };

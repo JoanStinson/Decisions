@@ -7,5 +7,7 @@ public:
 	Home();
 	~Home();
 
-	void Update() override;
+	void Enter(Agent* agent);
+	void Update(Agent* agent);
+	void Exit(Agent* agent, State* state);
 };

@@ -7,17 +7,21 @@
 #include "Graph.h"
 #include <iostream>
 #include <time.h>
+#include "Bank.h"
+#include "Home.h"
+#include "Mine.h"
+#include "Saloon.h"
 using namespace std;
 
-class ScenePlanning :
-	public Scene
-{
+class ScenePlanning : public Scene {
+
 public:
 	ScenePlanning();
 	~ScenePlanning();
 	void update(float dtime, SDL_Event *event);
 	void draw();
 	const char* getTitle();
+
 private:
 	std::vector<Agent*> agents;
 	Vector2D coinPosition;
@@ -39,8 +43,10 @@ private:
 	Vector2D pix2cell(Vector2D pix);
 	bool isValidCell(Vector2D cell);
 
+	// Our stuff
 	Graph graph;
 	Vector2D start;
 	vector<Vector2D> astar;
-
+	Vector2D prevPos = Vector2D(656, 624);
+	bool first = true;
 };
