@@ -40,7 +40,7 @@ public:
 	void setColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 	void update(Vector2D steering_force, float dtime, SDL_Event *event);
 	void draw();
-	bool Agent::loadSpriteTexture(char* filename, int num_frames=1);
+	bool loadSpriteTexture(char* filename, int num_frames=1);
 
 	// Our stuff
 	float RandomFloat(float a, float b);
@@ -51,7 +51,7 @@ public:
 
 	vector<Vector2D> frontierCount;
 	vector<pair<Vector2D, float>> vector_costs;
-
+	//TODO change variable names
 	State* currentState;
 	State* home;
 	State* mine;

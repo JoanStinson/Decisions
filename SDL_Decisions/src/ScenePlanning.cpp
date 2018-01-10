@@ -8,7 +8,7 @@ ScenePlanning::ScenePlanning() {
 	num_cell_x = SRC_WIDTH / CELL_SIZE;
 	num_cell_y = SRC_HEIGHT / CELL_SIZE;
 	initMaze();
-	loadTextures("../res/coin.png");
+	loadTextures("../res/coin.png", "../res/maze.png");
 
 	srand((unsigned int)time(NULL));
 
@@ -171,10 +171,10 @@ void ScenePlanning::drawMaze() {
 	if (draw_grid) {
 		SDL_SetRenderDrawColor(TheApp::Instance()->getRenderer(), 0, 0, 255, 255);
 		for (unsigned int i = 0; i < maze_rects.size(); i++)
-			SDL_RenderFillRect(TheApp::Instance()->getRenderer(), &maze_rects[i]);
+			SDL_RenderFillRect(TheApp::Instance()->getRenderer(), &maze_rects[i]);		
 	}
 	else {
-		//SDL_RenderCopy(TheApp::Instance()->getRenderer(), background_texture, NULL, NULL );
+		SDL_RenderCopy(TheApp::Instance()->getRenderer(), background_texture, NULL, NULL );
 	}
 }
 
@@ -266,13 +266,23 @@ void ScenePlanning::initMaze() {
 	}
 }
 
-bool ScenePlanning::loadTextures(char* filename_coin) {
+bool ScenePlanning::loadTextures(char* filename_coin, char* filename_bg) {
 	SDL_Surface *image = IMG_Load(filename_coin);
 	if (!image) {
 		cout << "IMG_Load: " << IMG_GetError() << endl;
 		return false;
 	}
 	coin_texture = SDL_CreateTextureFromSurface(TheApp::Instance()->getRenderer(), image);
+
+	if (image)
+		SDL_FreeSurface(image);
+
+	image = IMG_Load(filename_bg);
+	if (!image) {
+		cout << "IMG_Load: " << IMG_GetError() << endl;
+		return false;
+	}
+	background_texture = SDL_CreateTextureFromSurface(TheApp::Instance()->getRenderer(), image);
 
 	if (image)
 		SDL_FreeSurface(image);
