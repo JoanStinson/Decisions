@@ -8,9 +8,7 @@
 #include "utils.h"
 #include "SteeringBehavior.h"
 #include "Path.h"
-
 #include "State.h"
-
 #include "Graph.h"
 #include <iostream>
 #include <algorithm>
@@ -18,16 +16,62 @@
 #include <unordered_map>
 #include <stdlib.h>     
 #include <time.h>
-
 using namespace std;
-
 class State;
+
 class Agent {
 
 	friend class SteeringBehavior;
 
+public:
+	Agent();
+	~Agent();
+
+	SteeringBehavior *Behavior();
+	Vector2D getPosition();
+	Vector2D getTarget();
+	Vector2D getVelocity();
+
+	float getMaxVelocity();
+	void setPosition(Vector2D position);
+	void setTarget(Vector2D target);
+	void setVelocity(Vector2D velocity);
+	void setMass(float mass);
+	void setColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+	void update(Vector2D steering_force, float dtime, SDL_Event *event);
+	void draw();
+	bool Agent::loadSpriteTexture(char* filename, int num_frames=1);
+
+	// Our stuff
+	float RandomFloat(float a, float b);
+	float Heuristic(Vector2D a, Vector2D b);
+	void PrintStatistics(int a);
+	vector<Vector2D> AStar(Vector2D start, Vector2D goal, Graph graph, bool show_nodes);
+	void SwitchState(State* state);
+
+	vector<Vector2D> frontierCount;
+	vector<pair<Vector2D, float>> vector_costs;
+
+	State* currentState;
+	State* home;
+	State* mine;
+	State* bank;
+	State* saloon;
+	
+	int gold;
+	int wealth;
+	int tireness;
+	int totalWealth;
+	float thirst;
+	bool full;
+	bool thirsty;
+	bool rested;
+	bool wealthy;
+	Vector2D initPos;
+	Vector2D goalPos = Vector2D(656, 624);
+
 private:
-	SteeringBehavior *steering_behavior;
+	SteeringBehavior * steering_behavior;
 	Vector2D position;
 	Vector2D velocity;
 	Vector2D target;
@@ -46,54 +90,6 @@ private:
 	int sprite_h;
 	int min = 0, max = 0, average = 0, current = 0;
 	vector<int> sizes;
-
-public:
-	Agent();
-	~Agent();
-
-	// Our stuff
-	State* currentState;
-	State* home;
-	State* mine;
-	State* bank;
-	State* saloon;
-	void SwitchState(State* state);
-	int gold;
-	int wealth;
-	int tireness;
-	int totalWealth;
-	float thirst;
-	bool full;
-	bool thirsty;
-	bool rested;
-	bool wealthy;
-	Vector2D initPos;
-	Vector2D goalPos = Vector2D(656, 624);
-
-	// Utils
-	vector<Vector2D> frontierCount;
-	vector<pair<Vector2D, float>> vector_costs;
-	float RandomFloat(float a, float b);
-	float Heuristic(Vector2D a, Vector2D b);
-	void PrintStatistics(int a);
-
-	// Pathfinding Algorithms
-	vector<Vector2D> AStar(Vector2D start, Vector2D goal, Graph graph, bool show_nodes);
-
-	SteeringBehavior *Behavior();
-	Vector2D getPosition();
-	Vector2D getTarget();
-	Vector2D getVelocity();
-
-	float getMaxVelocity();
-	void setPosition(Vector2D position);
-	void setTarget(Vector2D target);
-	void setVelocity(Vector2D velocity);
-	void setMass(float mass);
-	void setColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
-	void update(Vector2D steering_force, float dtime, SDL_Event *event);
-	void draw();
-	bool Agent::loadSpriteTexture(char* filename, int num_frames=1);
 };
 
 //Implementation of different a priority queue than the STL one because it has problems with std::pair

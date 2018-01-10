@@ -1,8 +1,8 @@
 #include "ScenePlanning.h"
 using namespace std;
 
-ScenePlanning::ScenePlanning()
-{
+ScenePlanning::ScenePlanning() {
+
 	draw_grid = true;
 
 	num_cell_x = SRC_WIDTH / CELL_SIZE;
@@ -42,29 +42,28 @@ ScenePlanning::ScenePlanning()
 	}*/
 }
 
-ScenePlanning::~ScenePlanning()
-{
+ScenePlanning::~ScenePlanning() {
 	if (background_texture)
 		SDL_DestroyTexture(background_texture);
+
 	if (coin_texture)
 		SDL_DestroyTexture(coin_texture);
 
 	for (int i = 0; i < (int)agents.size(); i++)
-	{
 		delete agents[i];
-	}
 }
 
-void ScenePlanning::update(float dtime, SDL_Event *event)
-{
-	if (dtime >(60.f / 1000.f)) {
+void ScenePlanning::update(float dtime, SDL_Event *event) {
+
+	if (dtime >(60.f / 1000.f)) 
 		dtime = (60.f / 1000.f);
-	}
+	
 	if (agents[0]->goalPos != prevPos || first) {
 		path.points.push_back(agents[0]->goalPos);
 		prevPos = agents[0]->goalPos;
 		first = false;
 	}
+
 	/* Keyboard & Mouse events */
 	switch (event->type) {
 	case SDL_KEYDOWN:
@@ -74,7 +73,8 @@ void ScenePlanning::update(float dtime, SDL_Event *event)
 	default:
 		break;
 	}
-	if ((currentTargetIndex == -1) && (path.points.size() > 0)) currentTargetIndex = 0;
+	if ((currentTargetIndex == -1) && (path.points.size() > 0)) 
+		currentTargetIndex = 0;
 
 	if (currentTargetIndex >= 0) {
 
@@ -84,10 +84,12 @@ void ScenePlanning::update(float dtime, SDL_Event *event)
 			if (currentTargetIndex == path.points.size() - 1) {
 
 				if (dist < 3) {
+
+					// PathFollowing next Target
 					path.points.clear();
 					currentTargetIndex = -1;
 					agents[0]->setVelocity(Vector2D(0, 0));
-					agents[0]->currentState->Enter(agents[0]);
+					agents[0]->currentState->Enter(agents[0], 250);
 
 					// if we have arrived to the coin, replace it ina random cell!
 					if (pix2cell(agents[0]->getPosition()) == coinPosition) {
@@ -124,32 +126,28 @@ void ScenePlanning::update(float dtime, SDL_Event *event)
 	}
 	else {
 		agents[0]->update(Vector2D(0, 0), dtime, event);
-		agents[0]->currentState->Update(agents[0]);
+		agents[0]->currentState->Update();
 	}
 }
 
-void ScenePlanning::draw()
-{
+void ScenePlanning::draw() {
+
 	drawMaze();
 	drawCoin();
 
 	// Draw grid
-	if (draw_grid)
-	{
+	if (draw_grid) {
+
 		SDL_SetRenderDrawColor(TheApp::Instance()->getRenderer(), 255, 255, 255, 127);
 		for (int i = 0; i < SRC_WIDTH; i+=CELL_SIZE)
-		{
 			SDL_RenderDrawLine(TheApp::Instance()->getRenderer(), i, 0, i, SRC_HEIGHT);
-		}
+		
 		for (int j = 0; j < SRC_HEIGHT; j = j += CELL_SIZE)
-		{
 			SDL_RenderDrawLine(TheApp::Instance()->getRenderer(), 0, j, SRC_WIDTH, j);
-		}
 	}
 
 	// Draw path
-	for (int i = 0; i < (int)path.points.size(); i++)
-	{
+	for (int i = 0; i < (int)path.points.size(); i++) {
 		draw_circle(TheApp::Instance()->getRenderer(), (int)(path.points[i].x), (int)(path.points[i].y), 15, 255, 255, 0, 255);
 		if (i > 0)
 			SDL_RenderDrawLine(TheApp::Instance()->getRenderer(), (int)(path.points[i - 1].x), (int)(path.points[i - 1].y), (int)(path.points[i].x), (int)(path.points[i].y));
@@ -161,40 +159,33 @@ void ScenePlanning::draw()
 	}*/
 
 	draw_circle(TheApp::Instance()->getRenderer(), (int)currentTarget.x, (int)currentTarget.y, 15, 255, 0, 0, 255);
-
 	agents[0]->draw();
 }
 
-const char* ScenePlanning::getTitle()
-{
-	return "SDL Decisions :: FSM Function Pointer Style";
+const char* ScenePlanning::getTitle() {
+	return "SDL Decisions :: Finite State Machines (Function Pointer Style)";
 }
 
-void ScenePlanning::drawMaze()
-{
-	if (draw_grid)
-	{
+void ScenePlanning::drawMaze() {
 
+	if (draw_grid) {
 		SDL_SetRenderDrawColor(TheApp::Instance()->getRenderer(), 0, 0, 255, 255);
 		for (unsigned int i = 0; i < maze_rects.size(); i++)
 			SDL_RenderFillRect(TheApp::Instance()->getRenderer(), &maze_rects[i]);
 	}
-	else
-	{
+	else {
 		//SDL_RenderCopy(TheApp::Instance()->getRenderer(), background_texture, NULL, NULL );
 	}
 }
 
-void ScenePlanning::drawCoin()
-{
+void ScenePlanning::drawCoin() {
 	Vector2D coin_coords = cell2pix(coinPosition);
 	int offset = CELL_SIZE / 2;
 	SDL_Rect dstrect = {(int)coin_coords.x-offset, (int)coin_coords.y - offset, CELL_SIZE, CELL_SIZE};
 	SDL_RenderCopy(TheApp::Instance()->getRenderer(), coin_texture, NULL, &dstrect);
 }
 
-void ScenePlanning::initMaze()
-{
+void ScenePlanning::initMaze() {
 
 	// Initialize a list of Rectagles describing the maze geometry (useful for collision avoidance)
 	SDL_Rect rect = { 0, 0, 1280, 32 };
@@ -256,31 +247,26 @@ void ScenePlanning::initMaze()
 		for (int j = 0; j < num_cell_y; j++) {
 
 			if (terrain[i][j] == 1) {
+				Vector2D current = Vector2D(i, j);
 
-				if (j < num_cell_y - 1 && terrain[i][j + 1] != 0) {
-					graph.AddConnection(Vector2D(i, j), Vector2D(i, j + 1));
-				}
+				if (j < num_cell_y - 1 && terrain[i][j + 1] != 0) 
+					graph.AddConnection(current, Vector2D(i, j + 1));
 
-				if (i < num_cell_x - 1 && terrain[i + 1][j] != 0) {
-					graph.AddConnection(Vector2D(i, j), Vector2D(i + 1, j));
-				}
+				if (i < num_cell_x - 1 && terrain[i + 1][j] != 0) 
+					graph.AddConnection(current, Vector2D(i + 1, j));
 
-				if (j > 0 && terrain[i][j - 1] != 0) {
-					graph.AddConnection(Vector2D(i, j), Vector2D(i, j - 1));
-				}
+				if (j > 0 && terrain[i][j - 1] != 0) 
+					graph.AddConnection(current, Vector2D(i, j - 1));
 
-				if (i > 0 && terrain[i - 1][j] != 0) {
-					graph.AddConnection(Vector2D(i, j), Vector2D(i - 1, j));
-				}
+				if (i > 0 && terrain[i - 1][j] != 0) 
+					graph.AddConnection(current, Vector2D(i - 1, j));
 
 			}
 		}
 	}
-
 }
 
-bool ScenePlanning::loadTextures(char* filename_coin)
-{
+bool ScenePlanning::loadTextures(char* filename_coin) {
 	SDL_Surface *image = IMG_Load(filename_coin);
 	if (!image) {
 		cout << "IMG_Load: " << IMG_GetError() << endl;
@@ -294,19 +280,16 @@ bool ScenePlanning::loadTextures(char* filename_coin)
 	return true;
 }
 
-Vector2D ScenePlanning::cell2pix(Vector2D cell)
-{
+Vector2D ScenePlanning::cell2pix(Vector2D cell) {
 	int offset = CELL_SIZE / 2;
 	return Vector2D(cell.x*CELL_SIZE + offset, cell.y*CELL_SIZE + offset);
 }
 
-Vector2D ScenePlanning::pix2cell(Vector2D pix)
-{
+Vector2D ScenePlanning::pix2cell(Vector2D pix) {
 	return Vector2D((float)((int)pix.x/CELL_SIZE), (float)((int)pix.y / CELL_SIZE));
 }
 
-bool ScenePlanning::isValidCell(Vector2D cell)
-{
+bool ScenePlanning::isValidCell(Vector2D cell) {
 	if ((cell.x < 0) || (cell.y < 0) || (cell.x >= terrain.size()) || (cell.y >= terrain[0].size()) )
 		return false;
 	return !(terrain[(unsigned int)cell.x][(unsigned int)cell.y] == 0);

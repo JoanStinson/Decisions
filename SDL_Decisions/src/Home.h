@@ -7,7 +7,5 @@ public:
 	Home();
 	~Home();
 
-	void Enter(Agent* agent);
-	void Update(Agent* agent);
-	void Exit(Agent* agent, State* state);
+	void Update();
 };

@@ -33,116 +33,6 @@ Agent::~Agent()
 		delete (steering_behavior);
 }
 
-void Agent::SwitchState(State * state) {
-	currentState = state;
-}
-
-float Agent::RandomFloat(float a, float b) {
-	float random = ((float)rand()) / (float)RAND_MAX;
-	float diff = b - a;
-	float r = random * diff;
-	return a + r;
-}
-
-float Agent::Heuristic(Vector2D a, Vector2D b) {
-	return abs(a.x - b.x) + abs(a.y - b.y);
-}
-
-void Agent::PrintStatistics(int a) {
-	// Current
-	current = a;
-
-	// Min
-	if (min == 0) min = a;
-	else if (a < min) min = a;
-
-	// Max
-	if (max == 0) max = a;
-	else if (a > max) max = a;
-
-	// Average
-	sizes.push_back(a);
-	int temp = 0;
-	for (int i = 0; i < sizes.size(); i++) {
-		temp += sizes[i];
-	}
-	average = temp / sizes.size();
-
-	// Print
-	cout << "\r" << "  Current: " << current << " Min: " << min << " Max: " << max << " Average: " << average << "            ";
-}
-
-vector<Vector2D> Agent::AStar(Vector2D start, Vector2D goal, Graph graph, bool show_nodes) {
-	PriorityQueue<Vector2D, float> frontier;
-	frontier.put(start, 0.f);
-
-	unordered_map<Vector2D, Vector2D> came_from;
-	came_from[start] = NULL;
-
-	unordered_map<Vector2D, float> cost_so_far;
-	cost_so_far[start] = 0.f;
-
-	vector<Vector2D> path, neighbors;
-	Vector2D current, next;
-	bool visited;
-	float new_cost, priority;
-	float randCost;
-
-	while (!frontier.empty()) {
-
-		current = frontier.get();
-
-		if (current == goal) {
-			if (show_nodes) {
-				int size = frontierCount.size();
-				PrintStatistics(size);
-			}
-			else cout << "\r" << "           " << "    " << "      " << "    " << "      " << "    " << "          " << "    " << "            ";
-			path.push_back(current);
-			while (current != start) {
-				current = came_from[current];
-				path.push_back(current);
-			}
-			path.push_back(start);
-			std::reverse(path.begin(), path.end());
-			return path;
-		}
-
-		neighbors = graph.GetConnections(current);
-
-		for (unsigned int i = 0; i < neighbors.size(); i++) {
-			visited = false;
-			next = neighbors[i];
-			randCost = (rand() % 6) + 1; //RandomFloat(0, 7);
-			new_cost = cost_so_far[current] + randCost; //TODO implement GetCost method to do + 'graph.GetCost(current, next)' instead of rand
-
-			for (unsigned int j = 0; j < cost_so_far.size(); j++) {
-				// If next in cost_so_far 
-				if (cost_so_far.find(next) != cost_so_far.end()) {
-					if (new_cost > cost_so_far[next]) { // if 'new_cost < cost_so_far[next]' visited = false perque el volem afegir, if 'new_cost > cost_so_far[next]' nol volem per tant visited = false
-						visited = true;
-					}
-				}
-				// If next not in cost_so_far
-				else {
-					visited = false;
-				}
-
-			}
-
-			if (!visited) {
-				cost_so_far[next] = new_cost;
-				priority = new_cost + Heuristic(goal, next);
-				frontier.put(next, priority);
-				came_from[next] = current;
-				//Count :)
-				frontierCount.push_back(next);
-				vector_costs.push_back(std::make_pair(next, randCost));
-			}
-		}
-	}
-}
-
 SteeringBehavior * Agent::Behavior()
 {
 	return steering_behavior;
@@ -271,4 +161,114 @@ bool Agent::loadSpriteTexture(char* filename, int _num_frames)
 		SDL_FreeSurface(image);
 
 	return true;
+}
+
+float Agent::RandomFloat(float a, float b) {
+	float random = ((float)rand()) / (float)RAND_MAX;
+	float diff = b - a;
+	float r = random * diff;
+	return a + r;
+}
+
+float Agent::Heuristic(Vector2D a, Vector2D b) {
+	return abs(a.x - b.x) + abs(a.y - b.y);
+}
+
+void Agent::PrintStatistics(int a) {
+	// Current
+	current = a;
+
+	// Min
+	if (min == 0) min = a;
+	else if (a < min) min = a;
+
+	// Max
+	if (max == 0) max = a;
+	else if (a > max) max = a;
+
+	// Average
+	sizes.push_back(a);
+	int temp = 0;
+	for (int i = 0; i < sizes.size(); i++) {
+		temp += sizes[i];
+	}
+	average = temp / sizes.size();
+
+	// Print
+	cout << "\r" << "  Current: " << current << " Min: " << min << " Max: " << max << " Average: " << average << "            ";
+}
+
+vector<Vector2D> Agent::AStar(Vector2D start, Vector2D goal, Graph graph, bool show_nodes) {
+	PriorityQueue<Vector2D, float> frontier;
+	frontier.put(start, 0.f);
+
+	unordered_map<Vector2D, Vector2D> came_from;
+	came_from[start] = NULL;
+
+	unordered_map<Vector2D, float> cost_so_far;
+	cost_so_far[start] = 0.f;
+
+	vector<Vector2D> path, neighbors;
+	Vector2D current, next;
+	bool visited;
+	float new_cost, priority;
+	float randCost;
+
+	while (!frontier.empty()) {
+
+		current = frontier.get();
+
+		if (current == goal) {
+			if (show_nodes) {
+				int size = frontierCount.size();
+				PrintStatistics(size);
+			}
+			else cout << "\r" << "           " << "    " << "      " << "    " << "      " << "    " << "          " << "    " << "            ";
+			path.push_back(current);
+			while (current != start) {
+				current = came_from[current];
+				path.push_back(current);
+			}
+			path.push_back(start);
+			std::reverse(path.begin(), path.end());
+			return path;
+		}
+
+		neighbors = graph.GetConnections(current);
+
+		for (unsigned int i = 0; i < neighbors.size(); i++) {
+			visited = false;
+			next = neighbors[i];
+			randCost = (rand() % 6) + 1; //RandomFloat(0, 7);
+			new_cost = cost_so_far[current] + randCost; //TODO implement GetCost method to do + 'graph.GetCost(current, next)' instead of rand
+
+			for (unsigned int j = 0; j < cost_so_far.size(); j++) {
+				// If next in cost_so_far 
+				if (cost_so_far.find(next) != cost_so_far.end()) {
+					if (new_cost > cost_so_far[next]) { // if 'new_cost < cost_so_far[next]' visited = false perque el volem afegir, if 'new_cost > cost_so_far[next]' nol volem per tant visited = false
+						visited = true;
+					}
+				}
+				// If next not in cost_so_far
+				else {
+					visited = false;
+				}
+
+			}
+
+			if (!visited) {
+				cost_so_far[next] = new_cost;
+				priority = new_cost + Heuristic(goal, next);
+				frontier.put(next, priority);
+				came_from[next] = current;
+				//Count :)
+				frontierCount.push_back(next);
+				vector_costs.push_back(std::make_pair(next, randCost));
+			}
+		}
+	}
+}
+
+void Agent::SwitchState(State * state) {
+	currentState = state;
 }
