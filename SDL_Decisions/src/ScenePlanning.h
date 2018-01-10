@@ -31,7 +31,7 @@ private:
 	int num_cell_x;
 	int num_cell_y;
 	bool draw_grid;
-	std::vector<SDL_Rect> maze_rects;
+	vector<SDL_Rect> maze_rects;
 	void drawMaze();
 	void drawCoin();
 	SDL_Texture *background_texture;
@@ -48,6 +48,5 @@ private:
 	Graph graph;
 	Vector2D start;
 	vector<Vector2D> astar;
-	Vector2D pastLocation;
-	bool isFirstState;
+	Vector2D previousPosition;
 };

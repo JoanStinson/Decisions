@@ -52,7 +52,7 @@ public:
 	int fatigue;
 	int thirst;
 
-	Vector2D objectivePosition, firstLocation;
+	Vector2D objectivePosition;
 	State *bankState, *homeState, *mineState, *saloonState, *currentState;
 
 private:

@@ -28,8 +28,7 @@ ScenePlanning::ScenePlanning() {
 		coinPosition = Vector2D((float)(rand() % num_cell_x), (float)(rand() % num_cell_y));
 
 	// PathFollowing next Target
-	isFirstState = true;
-	pastLocation = Vector2D(593, 145);
+	previousPosition = Vector2D(593, 145);
 	currentTarget = Vector2D(0, 0);
 	currentTargetIndex = -1;
 	agents[0]->SwitchState(agents[0]->mineState);
@@ -66,12 +65,9 @@ void ScenePlanning::update(float dtime, SDL_Event *event) {
 		break;
 	}
 
-	if (isFirstState || agents[0]->objectivePosition != pastLocation) {
-		isFirstState = false;
-		if (!isFirstState) {
+	if (currentTarget == Vector2D(0, 0) || agents[0]->objectivePosition != previousPosition) {
 			path.points.push_back(agents[0]->objectivePosition);
-			pastLocation = agents[0]->objectivePosition;
-		}
+			previousPosition = agents[0]->objectivePosition;
 	}
 
 	if ((currentTargetIndex == -1) && (path.points.size() > 0)) 
