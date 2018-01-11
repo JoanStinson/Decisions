@@ -17,11 +17,11 @@
 #include <stdlib.h>     
 #include <time.h>
 using namespace std;
-class State;
 
 class Agent {
 
 	friend class SteeringBehavior;
+	friend class State;
 
 public:
 	Agent();

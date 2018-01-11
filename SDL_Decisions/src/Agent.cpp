@@ -21,8 +21,10 @@ Agent::Agent() : sprite_texture(0),
 	mineState = new MineState;
 	saloonState = new SaloonState;
 	objectivePosition = Vector2D(593, 145);
-	fatigue = 0;
 	pockets = 0;
+	wealth = 0;
+	fatigue = 0;
+	thirst = 0;
 }
 
 Agent::~Agent()
