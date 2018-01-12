@@ -208,15 +208,13 @@ vector<Vector2D> Agent::AStar(Vector2D start, Vector2D goal, Graph graph) {
 			randCost = (rand() % 6) + 1; 
 			new_cost = cost_so_far[current] + randCost; //TODO implement GetCost method to do + 'graph.GetCost(current, next)' instead of rand
 
-			//for (unsigned int j = 0; j < cost_so_far.size(); j++) {
-				// If next in cost_so_far 
-				if (cost_so_far.find(next) != cost_so_far.end()) {
-					if (new_cost > cost_so_far[next])  // if 'new_cost < cost_so_far[next]' visited = false perque el volem afegir, if 'new_cost > cost_so_far[next]' nol volem per tant visited = false
-						visited = true;
-				}
-				// If next not in cost_so_far
-				else visited = false;
-			//}
+			// If next in cost_so_far 
+			if (cost_so_far.find(next) != cost_so_far.end()) {
+				if (new_cost >= cost_so_far[next])  // if 'new_cost < cost_so_far[next]' visited = false perque el volem afegir, if 'new_cost > cost_so_far[next]' nol volem per tant visited = false
+					visited = true;
+			}
+			// If next not in cost_so_far
+			else visited = false;
 
 			if (!visited) {
 				cost_so_far[next] = new_cost;
