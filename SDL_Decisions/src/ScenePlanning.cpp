@@ -19,7 +19,7 @@ ScenePlanning::ScenePlanning() {
 	Vector2D rand_cell(-1, -1);
 	while (!isValidCell(rand_cell))
 		rand_cell = Vector2D((float)(rand() % num_cell_x), (float)(rand() % num_cell_y));
-	agents[0]->setPosition(cell2pix(rand_cell));
+	agents[0]->setPosition(cell2pix(Vector2D(8, 3)));
 	start = agents[0]->getPosition();
 
 	// Set the coin in a random cell (but at least 3 cells far from the agent)
@@ -28,18 +28,10 @@ ScenePlanning::ScenePlanning() {
 		coinPosition = Vector2D((float)(rand() % num_cell_x), (float)(rand() % num_cell_y));
 
 	// PathFollowing next Target
-	previousPosition = Vector2D(593, 145);
+	previousPosition = Vector2D(272, 112);
 	currentTarget = Vector2D(0, 0);
 	currentTargetIndex = -1;
 	agents[0]->SwitchState(agents[0]->mineState);
-
-	/* A* Algorithm
-	agents[0]->vector_costs.clear();
-	agents[0]->frontierCount.clear();
-	astar = agents[0]->AStar(pix2cell(start), coinPosition, graph, true);
-	for (unsigned int i = 0; i < astar.size(); i++) {
-		path.points.push_back(cell2pix(astar[i]));
-	}*/
 }
 
 ScenePlanning::~ScenePlanning() {
@@ -66,7 +58,9 @@ void ScenePlanning::update(float dtime, SDL_Event *event) {
 	}
 
 	if (currentTarget == Vector2D(0, 0) || agents[0]->objectivePosition != previousPosition) {
-			path.points.push_back(agents[0]->objectivePosition);
+			astar = agents[0]->AStar(pix2cell(agents[0]->getPosition()), pix2cell(agents[0]->objectivePosition), graph);
+			for (unsigned int i = 0; i < astar.size(); i++) 
+				path.points.push_back(cell2pix(astar[i]));
 			previousPosition = agents[0]->objectivePosition;
 	}
 
@@ -94,18 +88,6 @@ void ScenePlanning::update(float dtime, SDL_Event *event) {
 						
 						while ((!isValidCell(coinPosition)) || (Vector2D::Distance(coinPosition, pix2cell(agents[0]->getPosition())) < 3))
 							coinPosition = Vector2D((float)(rand() % num_cell_x), (float)(rand() % num_cell_y));
-
-						/*agents[0]->setPosition(path.points.back());
-						start = agents[0]->getPosition();
-						path.points.clear();*/
-
-						// A* Algorithm
-						/*agents[0]->vector_costs.clear();
-						agents[0]->frontierCount.clear();
-						astar = agents[0]->AStar(pix2cell(start), coinPosition, graph, true);
-						for (unsigned int i = 0; i < astar.size(); i++) {
-							path.points.push_back(cell2pix(astar[i]));
-						}*/
 					}
 				}
 				else {

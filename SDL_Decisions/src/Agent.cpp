@@ -20,7 +20,7 @@ Agent::Agent() : sprite_texture(0),
 	homeState = new HomeState;
 	mineState = new MineState;
 	saloonState = new SaloonState;
-	objectivePosition = Vector2D(593, 145);
+	objectivePosition = Vector2D(272, 112);
 	pockets = 0;
 	wealth = 0;
 	fatigue = 0;
@@ -210,7 +210,7 @@ vector<Vector2D> Agent::AStar(Vector2D start, Vector2D goal, Graph graph) {
 
 			// If next in cost_so_far 
 			if (cost_so_far.find(next) != cost_so_far.end()) {
-				if (new_cost >= cost_so_far[next])  // if 'new_cost < cost_so_far[next]' visited = false perque el volem afegir, if 'new_cost > cost_so_far[next]' nol volem per tant visited = false
+				if (new_cost > cost_so_far[next])  // if 'new_cost < cost_so_far[next]' visited = false perque el volem afegir, if 'new_cost > cost_so_far[next]' nol volem per tant visited = false
 					visited = true;
 			}
 			// If next not in cost_so_far

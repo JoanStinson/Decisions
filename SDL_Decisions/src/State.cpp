@@ -1,10 +1,10 @@
 #include "State.h"
 
 State::State() {
-	bankPosition = Vector2D(209, 656);
-	homePosition = Vector2D(656, 656);
-	minePosition = Vector2D(656, 145);
-	saloonPosition = Vector2D(1042, 656);
+	bankPosition = Vector2D(208, 624);
+	homePosition = Vector2D(624, 624);
+	minePosition = Vector2D(272, 112);
+	saloonPosition = Vector2D(1040, 624);
 }
 
 State::~State() {
