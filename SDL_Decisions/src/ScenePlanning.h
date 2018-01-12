@@ -45,6 +45,7 @@ private:
 
 	// Our stuff
 	void InitConnections();
+	void ChangeObjective();
 	Graph graph;
 	Vector2D start;
 	vector<Vector2D> astar;

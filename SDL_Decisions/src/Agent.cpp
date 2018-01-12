@@ -205,7 +205,7 @@ vector<Vector2D> Agent::AStar(Vector2D start, Vector2D goal, Graph graph) {
 		for (unsigned int i = 0; i < neighbors.size(); i++) {
 			visited = false;
 			next = neighbors[i];
-			randCost = (rand() % 6) + 1; 
+			randCost = (rand() % 3) + 1; 
 			new_cost = cost_so_far[current] + randCost; //TODO implement GetCost method to do + 'graph.GetCost(current, next)' instead of rand
 
 			// If next in cost_so_far 

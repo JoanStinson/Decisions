@@ -57,12 +57,7 @@ void ScenePlanning::update(float dtime, SDL_Event *event) {
 		break;
 	}
 
-	if (currentTarget == Vector2D(0, 0) || agents[0]->objectivePosition != previousPosition) {
-			astar = agents[0]->AStar(pix2cell(agents[0]->getPosition()), pix2cell(agents[0]->objectivePosition), graph);
-			for (unsigned int i = 0; i < astar.size(); i++) 
-				path.points.push_back(cell2pix(astar[i]));
-			previousPosition = agents[0]->objectivePosition;
-	}
+	ChangeObjective();
 
 	if ((currentTargetIndex == -1) && (path.points.size() > 0)) 
 		currentTargetIndex = 0;
@@ -283,5 +278,15 @@ void ScenePlanning::InitConnections() {
 
 			}
 		}
+	}
+}
+
+void ScenePlanning::ChangeObjective(){
+	if (currentTarget == Vector2D(0, 0) || agents[0]->objectivePosition != previousPosition) {
+		start = agents[0]->getPosition();
+		astar = agents[0]->AStar(pix2cell(start), pix2cell(agents[0]->objectivePosition), graph);
+		for (unsigned int i = 0; i < astar.size(); i++)
+			path.points.push_back(cell2pix(astar[i]));
+		previousPosition = agents[0]->objectivePosition;
 	}
 }
