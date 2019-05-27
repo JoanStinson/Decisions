@@ -1,4 +1,4 @@
 # C++ Artificial Intelligence Decisions
 
-- Finite State Machines
-- Goal Oriented Action Planning
+- ## Finite State Machines (Function Pointer Style)
+![](fsm.gif)
