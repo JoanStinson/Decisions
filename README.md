@@ -1,4 +1,4 @@
-# C++ SDL Artificial Intelligence Decisions
+# Decisions
 
 <p align="center">
   <a>
