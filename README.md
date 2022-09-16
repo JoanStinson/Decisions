@@ -5,7 +5,7 @@
     <img alt="Made With SDL" src="https://img.shields.io/badge/made%20with-SDL-57b9d3.svg?logo=CPlusPlus">
   </a>
   <a>
-    <img alt="License" src="https://img.shields.io/github/license/JoanStinson/Decisions?&logo=github">
+    <img alt="License" src="https://img.shields.io/github/license/JoanStinson/Decisions?logo=github">
   </a>
   <a>
     <img alt="Last Commit" src="https://img.shields.io/github/last-commit/JoanStinson/Decisions?logo=Mapbox&color=orange">
