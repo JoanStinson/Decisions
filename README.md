@@ -2,7 +2,7 @@
 
 <p align="center">
   <a>
-    <img alt="Made With SDL" src="https://img.shields.io/badge/made%20with-SDL-57b9d3.svg?logo=C">
+    <img alt="Made With SDL" src="https://img.shields.io/badge/made%20with-SDL-57b9d3.svg?logo=CPlusPlus">
   </a>
   <a>
     <img alt="License" src="https://img.shields.io/github/license/JoanStinson/Decisions?&logo=github">
